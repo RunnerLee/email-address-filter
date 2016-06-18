@@ -1,0 +1,10 @@
+.DS_Store
+vendor
+composer.lock
+.buildpath
+.settings
+.project
+bin
+/nbproject/*
+*.iml
+.idea
