@@ -102,7 +102,7 @@ class EmailAddressFilter
     {
         $domain = strtolower($domain);
         while(!$this->tempTable->eof()) {
-            if($domain == trim($this->tempTable->current())) {
+            if($domain == trim($this->tempTable->fgets())) {
                 return true;
             }
         }
@@ -183,5 +183,6 @@ class EmailAddressFilter
     public function __destruct()
     {
         unset($this->file);
+        unset($this->tempTable);
     }
 }
