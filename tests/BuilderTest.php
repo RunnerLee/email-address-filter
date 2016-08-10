@@ -14,7 +14,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuilder()
     {
-        Builder::build(__DIR__ . '/fixtures/emailList.txt', __DIR__ . '/fixtures/list.dict');
+        Builder::build(__DIR__ . '/fixtures/domain.list', __DIR__ . '/fixtures/list.dict');
     }
 
 }

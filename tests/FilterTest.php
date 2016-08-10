@@ -25,6 +25,13 @@ class FilterTest extends \PHPUnit_Framework_TestCase
     public function testFilter()
     {
         $this->assertSame('runnerleer@gmail.com', $this->filter->filter('runnerleer@gmail.com'));
+        $this->assertSame(false, $this->filter->filter('runnerleer@delaynomore.com'));
+    }
+
+
+    public function testFilterWithQueryDns()
+    {
+        $this->assertEquals('runnerleer@linghit.com', $this->filter->filterWithQueryDns('runnerleer@linghit.com'));
     }
 
 }

@@ -41,27 +41,26 @@ class Builder
                 ];
                 $current = $data[$current][1][$key] = $insert++;
             }
+            $data[$current][0] = 1;
         }
 
         $count = count($data);
-        $data[0] = $data[0][0] . '  ' . implode(' ', array_keys($data[0][1])) . '  ' . implode('', array_map(function($v) {
-                return chr($v);
-            }, array_values($data[0][1])));
+
+        $temp = array_values($data[0][1]);
+        array_unshift($temp, 'n*');
+
+        $data[0] = $data[0][0] . '  ' . implode(' ', array_keys($data[0][1])) . '  ' . str_replace(["\n", "\r"], ['(**)', '<**>'], call_user_func_array('pack', $temp));
 
         for($i = 1; $i < $count; ++$i) {
             $node = array_keys($data[$i][1]);
             $position = array_values($data[$i][1]);
+            array_unshift($position, 'n*');
 
-            $data[$i] = $data[$i][0] . '  ' . implode('', $node) . '  ' . implode('', array_map(function($v) {
-                    return chr($v + 12);
-                }, $position));
+            $data[$i] = $data[$i][0] . '  ' . implode('', $node) . '  ' . str_replace(["\n", "\r"], ['(**)', '<**>'], call_user_func_array('pack', $position));
         }
         
         file_put_contents($output, implode("\n", $data));
 
         return true;
     }
-
-
-
 }

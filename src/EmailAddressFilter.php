@@ -34,10 +34,11 @@ class EmailAddressFilter
     public function __construct($dictionary, $tempTable = null)
     {
         $this->file = new \SplFileObject($dictionary);
-        $line = explode('  ', trim($this->file->current()));
+        $line = explode('  ', trim($this->file->current(), "\n"));
+
         $this->topDomain = [
             $line[0],
-            array_combine(explode(' ', $line[1]), unpack('c*', $line[2]))
+            array_combine(explode(' ', $line[1]), unpack('n*', str_replace(['(**)', '<**>'], ["\n", "\r"], $line[2])))
         ];
         if(!is_null($tempTable)) {
             $this->tempTable = new \SplFileObject($tempTable);
@@ -75,8 +76,10 @@ class EmailAddressFilter
             return false;
         }
         $domain = explode('@', $email)[1];
-        if($this->searchTree($domain)) {
-            return $email;
+        if(!$this->searchTree($domain)) {
+            if(!is_null($this->tempTable) && $this->searchFromTempTable($domain) ) {
+                return true;
+            }
         }
 
         if(!@dns_get_record($domain, DNS_MX)) {
@@ -99,7 +102,7 @@ class EmailAddressFilter
     {
         $domain = strtolower($domain);
         while(!$this->tempTable->eof()) {
-            if($domain == trim($this->tempTable->current())) {
+            if($domain == trim($this->tempTable->fgets())) {
                 return true;
             }
         }
@@ -158,18 +161,18 @@ class EmailAddressFilter
 
             $node = [
                 $line[0],
-                array_combine(unpack('c*', $line[1]), unpack('c*', $line[2])),
+                array_combine(unpack('c*', $line[1]), unpack('n*', str_replace(['(**)', '<**>'], ["\n", "\r"], $line[2]))),
             ];
 
             if(isset($node[1][$key])) {
-                $current = $node[1][$key] - 12;
+                $current = $node[1][$key];
                 continue;
             }
             $matched = false;
         }
         $this->file->seek($current);
 
-        if('0' !== trim($this->file->current())) {
+        if($matched && '1' !== substr(trim($this->file->current()), 0, 1)) {
             $matched = false;
         }
 
@@ -180,5 +183,6 @@ class EmailAddressFilter
     public function __destruct()
     {
         unset($this->file);
+        unset($this->tempTable);
     }
 }
