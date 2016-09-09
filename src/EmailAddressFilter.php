@@ -153,7 +153,8 @@ class EmailAddressFilter
 
         foreach($word as $key) {
             $this->file->seek($current);
-            $line = explode('  ', trim($this->file->current()));
+
+            $line = explode('  ', trim($this->file->current(), "\r\n"));
 
             if(!isset($line[2])) {
                 return false;
